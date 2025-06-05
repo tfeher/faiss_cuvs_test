@@ -20,7 +20,7 @@ import os
 import numpy as np
 import math
 import argparse
-import sklearn
+import cuml
 
 
 def generate_dataset(filename, n_samples, n_features, dtype=np.float32):
@@ -53,7 +53,7 @@ def generate_dataset(filename, n_samples, n_features, dtype=np.float32):
     while i < n_samples:
         n_batch = n if i + n <= n_samples else n_samples - i
 
-        tmp, y = sklearn.datasets.make_blobs(
+        tmp, y = cuml.datasets.make_blobs(
             n_batch,
             n_features,
             centers=n_centers,
@@ -96,5 +96,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    cuml.set_global_output_type('numpy')
 
     generate_dataset(args.filename, args.rows, args.cols)

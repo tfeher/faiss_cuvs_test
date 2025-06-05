@@ -1,0 +1,92 @@
+{
+  "dataset": {
+    "name": "blobs_256-100M",
+    "subset_size": 100000000,
+    "base_file": "blobs.100M.fbin",
+    "query_file": "blobs_256_100M/queries.fbin",
+    "groundtruth_neighbors_file": "blobs_256_100M/groundtruth.neighbors.ibin",
+    "distance": "euclidean"
+  },
+  "search_basic_param": {
+    "batch_size": 10000,
+    "k": 2048
+  },
+  "index": [
+    {
+      "name": "faiss_ivf_pq.M64-nlist16K",
+      "algo": "faiss_gpu_ivf_pq",
+      "build_param": {
+        "M": 64,
+        "nlist": 16384,
+        "ratio": 10,
+        "use_cuvs": true,
+        "useFloat16": false
+      },
+      "file": "blobs_256/faiss_ivf_pq/M64-nlist16K",
+      "search_params": [
+        {
+          "nprobe": 10
+        },
+        {
+          "nprobe": 20
+        },
+        {
+          "nprobe": 30
+        },
+        {
+          "nprobe": 40
+        },
+        {
+          "nprobe": 64
+        },
+        {
+          "nprobe": 100
+        },
+        {
+          "nprobe": 200
+        },
+        {
+          "nprobe": 500
+        }
+      ]
+    },
+    {
+      "name": "cuvs_ivf_pq.d64-nlist16K",
+      "algo": "cuvs_ivf_pq",
+      "build_param": {
+        "pq_dim": 64,
+        "pq_bits": 8,
+        "nlist": 16384,
+        "niter": 10,
+        "ratio": 10
+      },
+      "file": "blobs_256/cuvs_ivf_pq/d64-nlist16K",
+      "search_params": [
+        {
+          "nprobe": 20,
+          "internalDistanceDtype": "half",
+          "smemLutDtype": "half",
+          "refine_ratio": 1
+        },
+        {
+          "nprobe": 40,
+          "internalDistanceDtype": "half",
+          "smemLutDtype": "half",
+          "refine_ratio": 1
+        },
+        {
+          "nprobe": 64,
+          "internalDistanceDtype": "half",
+          "smemLutDtype": "half",
+          "refine_ratio": 1
+        },
+        {
+          "nprobe": 100,
+          "internalDistanceDtype": "half",
+          "smemLutDtype": "half",
+          "refine_ratio": 1
+        }
+      ]
+    }
+  ]
+}

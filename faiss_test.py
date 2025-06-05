@@ -25,6 +25,7 @@ from utils import memmap_bin_file, calc_recall, BenchmarkTimer
 from timeit import default_timer as timer
 import faiss
 import argparse
+from scipy.stats import describe
 
 import rmm
 pool = rmm.mr.PoolMemoryResource(
@@ -83,6 +84,8 @@ if __name__ == "__main__":
 
     parser.add_argument("-r", "--read_index", action="store_true")
     parser.add_argument("-f", "--index_file", default="tmp_index_file")
+    parser.add_argument("-v", "--verbose", help="Print more details on measured times", action="store_true")
+
   
     args = parser.parse_args()
     if args.rows != 0 and args.cols == 0:
@@ -141,8 +144,8 @@ if __name__ == "__main__":
         print("Index read from", args.index_file)
         res = faiss.StandardGpuResources()
         co = faiss.GpuClonerOptions()
-        co.useFloat16 = True
-        co.usePrecomputed = True
+        # co.useFloat16 = True
+        # co.usePrecomputed = True
         # make it an IVF GPU index
         index = faiss.index_cpu_to_gpu(res, 0, index, co)
         print("Index moved to GPU")
@@ -216,7 +219,7 @@ if __name__ == "__main__":
     cp.cuda.profiler.start()
 
     res_list = ["batch_size,n_clusters,n_probes,k,recall,qps,avg_time (ms),std_time (ms)"]
-    
+
     for query_batch_size in args.batch_size:
         print("query with batch size", query_batch_size)
 
@@ -239,7 +242,9 @@ if __name__ == "__main__":
         print("recall", r)
 
         timings = np.asarray(timer.timings)
-
+        if args.verbose:
+            print(describe(timings))
+            print(timings[:20])
         avg_time = timings.mean() * 1000
         std_time = timings.std() * 1000
         qps = query_batch_size / (avg_time / 1000)
